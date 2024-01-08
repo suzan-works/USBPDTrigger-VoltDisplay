@@ -25,7 +25,7 @@ https://youtu.be/PSXAfMaWH_A?si=gFLTGL1ydqfZDPP8
 
 # 設計資料 v1.0
 ## 回路図
-- 回路図 [PDF](回路図.pdf)
+- 回路図 [PDF](回路図.pdf) [KiCanvas](https://kicanvas.org/?github=https%3A%2F%2Fgithub.com%2Fsuzan-works%2FUSBPDTrigger-VoltDisplay%2Fblob%2Fmain%2FKiCad%2FCH32X035_USBPD-Trigger_4.kicad_sch)  
 - BOM
 
 |Reference|Value|ECサイト|コメント|
@@ -52,6 +52,7 @@ https://youtu.be/PSXAfMaWH_A?si=gFLTGL1ydqfZDPP8
 |SW1, SW2|タクトスイッチ<br>SKRPABE010|https://akizukidenshi.com/catalog/g/gP-06184/| |
 
 ## プリント基板
+- 基板CAD [KiCanvas](https://kicanvas.org/?github=https%3A%2F%2Fgithub.com%2Fsuzan-works%2FUSBPDTrigger-VoltDisplay%2Fblob%2Fmain%2FKiCad%2FCH32X035_USBPD-Trigger_5.kicad_pcb)
 - 外観写真  
 ![プリント基板](プリント基板.jpg)
 
