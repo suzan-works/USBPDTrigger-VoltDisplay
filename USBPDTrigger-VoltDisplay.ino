@@ -1,5 +1,5 @@
 // 電圧表示付き USB PDトリガー
-// ファームウェア v1.0
+// ファームウェア v1.1
 // WCH CH32X035
 // 設計 @suzan_works
 
@@ -689,6 +689,17 @@ void sendCommand(uint8_t command)
 	digitalWrite(OLED_DC, HIGH); // Data mode
 }
 
+// ボタンチャタリング防止用の変数
+unsigned long currentTime = 0;
+unsigned long previousTime = 0;
+const unsigned long interval = 80; // 判定間隔(ミリ秒)
+bool btnAState = 1;
+bool btnBState = 1;
+bool previousBtnAState = 1;
+bool previousBtnBState = 1;
+int previousPdNum = 0;
+int voltRead = 0;
+
 void setup()
 {
 	pinMode(OLED_CS, OUTPUT);
@@ -749,62 +760,77 @@ void setup()
 
 void loop()
 {
-	bool btnA = digitalRead(btnAPin);
-	bool btnB = digitalRead(btnBPin);
-
-	if (!btnA)
+	// ボタンチャタリング防止、ディスプレイちらつき防止
+	currentTime = millis();
+	if ((currentTime - previousTime) >= interval)
 	{
-		Serial.println("btnA");
-		pdNum++;
-		if (pdNum >= 5)
-		{
-			pdNum = 0;
-		}
+		previousTime = currentTime;
+		previousBtnAState = btnAState;
+		previousBtnBState = btnBState;		
+		btnAState = digitalRead(btnAPin);
+		btnBState = digitalRead(btnBPin);
+
+		voltRead = analogRead(vbusDividedPin);
+	}
+
+	if ((previousBtnAState == 0)&&(btnAState == 0))
+	{
+		//Serial.println("btnA");
+		btnAState = 1;
+		pdNum = (pdNum + 1) % 5;
 		isOutput = 0;
 		isLight = 0;
 	}
-	if (!btnB)
+
+	if ((previousBtnBState == 0)&&(btnBState == 0))
 	{
-		Serial.println("btnB");
+		//Serial.println("btnB");
+		btnBState = 1;
 		isOutput = !isOutput;
 		isLight = !isLight;
 	}
 
-	switch (pdNum)
+	if (pdNum != previousPdNum)
 	{
-	case 0:
-		setVoltage = REQUEST_5v;
-		break;
-	case 1:
-		setVoltage = REQUEST_9v;
-		break;
-	case 2:
-		setVoltage = REQUEST_12v;
-		break;
-	case 3:
-		setVoltage = REQUEST_15v;
-		break;
-	case 4:
-		setVoltage = REQUEST_20v;
-		break;
+		//Serial.println("pdNum");
 
-	default:
-		break;
+		switch (pdNum)
+		{
+		case 0:
+			setVoltage = REQUEST_5v;
+			break;
+		case 1:
+			setVoltage = REQUEST_9v;
+			break;
+		case 2:
+			setVoltage = REQUEST_12v;
+			break;
+		case 3:
+			setVoltage = REQUEST_15v;
+			break;
+		case 4:
+			setVoltage = REQUEST_20v;
+			break;
+
+		default:
+			break;
+		}
+
+		if (usbpd_sink_get_ready())
+		{
+			usbpd_sink_set_request_fixed_voltage(setVoltage);
+		}
+
+		previousPdNum = pdNum;
 	}
-
-	if (usbpd_sink_get_ready())
-	{
-		usbpd_sink_set_request_fixed_voltage(setVoltage);
-	}
-
+	
 	digitalWrite(outputPin, isOutput);
 	digitalWrite(ledPin, isLight);
 
-	int voltRead = analogRead(vbusDividedPin);
 	// 12bit
 	float result = (float)voltRead / 4095;
-	// 1k/10k分圧
-	volt = 11 * 3.3 * result;
+	// 1k/10k分圧、現物合わせで表示値調整
+	volt = (11 * 3.3 * result) * 0.9565 - 0.0989;
 
 	// OLED表示
 	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
@@ -822,6 +848,4 @@ void loop()
 
 	digitalWrite(OLED_CS, HIGH); // Disable OLED
 	SPI.endTransaction();		 // End the SPI transaction
-
-	delay(100);
 }
