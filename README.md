@@ -2,6 +2,9 @@
  WCH CH32X035 マイコンを使用して、Vbus電圧をSSD1306 OLEDモジュールに表示する、USB PDトリガーデバイスです。  
  ![使用例](使用例.png)
 
+# 紹介動画
+[![](https://img.youtube.com/vi/RrcGVxVSbrM/0.jpg)](https://www.youtube.com/watch?v=RrcGVxVSbrM)
+
 # 操作手順
 1. USB-CコネクタにUSB PD電源を接続します。
 1. 電圧切替スイッチで出力電圧を変更します。(5→9→12→15→20Vのループ)
@@ -15,6 +18,9 @@
 - 表示されるVbus電圧は目安で、測定器としての精度を保証するものではありません。
 - 出力電流は1A程度を想定して設計しています。
 - このデバイスの使用における損害は一切保証いたしません。自己責任でご使用ください。
+
+# 販売
+[boothにて販売中](https://suzan-works.booth.pm/items/5385432)
 
 # マイコン開発
 Arduino IDEでのファームウェア変更が可能です。  

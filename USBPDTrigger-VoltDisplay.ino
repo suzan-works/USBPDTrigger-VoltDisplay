@@ -1,5 +1,5 @@
 // 電圧表示付き USB PDトリガー
-// ファームウェア v1.1
+// ファームウェア v1.2
 // WCH CH32X035
 // 設計 @suzan_works
 
@@ -770,7 +770,14 @@ void loop()
 		btnAState = digitalRead(btnAPin);
 		btnBState = digitalRead(btnBPin);
 
-		voltRead = analogRead(vbusDividedPin);
+		// 電圧読み取りサンプルを取得して平均値を計算
+		int sum = 0;
+		for (int i = 0; i < 10; i++)
+		{
+			sum += analogRead(vbusDividedPin);
+			delay(1); // 必要に応じて遅延を追加
+		}
+		voltRead = sum / 10; 
 	}
 
 	if ((previousBtnAState == 0)&&(btnAState == 0))
@@ -830,7 +837,7 @@ void loop()
 	// 12bit
 	float result = (float)voltRead / 4095;
 	// 1k/10k分圧、現物合わせで表示値調整
-	volt = (11 * 3.3 * result) * 0.9565 - 0.0989;
+	volt = (11 * 3.3 * result) * 0.9465 - 0.0989;
 
 	// OLED表示
 	SPI.beginTransaction(SPISettings(100000, MSBFIRST, SPI_MODE0));
